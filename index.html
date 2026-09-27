@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>댠닺 떡밥 9선</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('image.png');
+            background-size: cover;
+            background-position: center center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif;
+            color: #1d1d1f;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            max-width: 480px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 20px 16px;
+            overflow-y: auto;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* 1. 게임 화면 */
+        .game-container {
+            background-color: #ffffff;
+            justify-content: flex-start;
+        }
+
+        .progress-section {
+            width: 100%;
+            margin-bottom: 4px;
+        }
+
+        .progress-text {
+            text-align: right;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #666666;
+            margin-bottom: 2px;
+        }
+
+        .progress-bar-bg {
+            width: 100%;
+            height: 4px;
+            background-color: rgba(0, 0, 0, 0.08);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            width: 0%;
+            height: 100%;
+            background-color: #FF3366;
+            transition: width 0.3s ease;
+        }
+
+        .question-box {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #1d1d1f;
+            text-align: center;
+            margin: 4px 0;
+            letter-spacing: -0.02em;
+        }
+
+        .choice-grid {
+            width: 100%;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            margin: auto 0;
+        }
+
+        .choice-card {
+            background-color: #fcfcfc;
+            border: 1px solid #eaeaea;
+            border-radius: 14px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.15s ease, border-color 0.2s ease;
+        }
+
+        .choice-card:active {
+            transform: scale(0.96);
+        }
+
+        .card-img-wrap {
+            width: 100%;
+            aspect-ratio: 3 / 4;
+            background-color: #f4f4f4;
+            overflow: hidden;
+        }
+
+        .card-img-wrap img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .card-info {
+            padding: 6px 4px;
+            text-align: center;
+            background-color: #f5f5f7;
+            transition: background-color 0.2s ease, color 0.2s ease;
+        }
+
+        .card-name {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: #1d1d1f;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .choice-card.selected {
+            border-color: #007AFF;
+        }
+
+        .choice-card.selected .card-info {
+            background-color: #007AFF;
+        }
+
+        .choice-card.selected .card-name {
+            color: #ffffff;
+        }
+
+        .game-footer {
+            width: 100%;
+            display: flex;
+            justify-content: flex-start;
+            padding: 2px 2px;
+            min-height: 28px;
+            align-items: center;
+        }
+
+        .back-btn {
+            background: none;
+            border: none;
+            color: #666666;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            padding: 2px 0;
+            transition: color 0.2s ease;
+        }
+
+        .back-btn:active {
+            color: #1d1d1f;
+        }
+
+        /* 2. 결과 화면 */
+        .result-container {
+            justify-content: space-between;
+            align-items: center;
+            background-color: #ffffff;
+            padding: 12px 10px;
+        }
+
+        .result-content-wrapper {
+            width: 100%;
+            max-width: 400px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .result-title-main {
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: #1d1d1f;
+            text-align: center;
+            margin-bottom: 6px;
+        }
+
+        .result-title-main .highlight {
+            color: #FF3366;
+        }
+
+        .result-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            width: 100%;
+        }
+
+        .result-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            background: transparent;
+            padding: 0;
+            box-shadow: none;
+        }
+
+        .result-img-wrap {
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.08);
+            margin-bottom: 3px;
+            background: #f4f4f4;
+        }
+
+        .result-img-wrap img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .result-rank {
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            background-color: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            color: white;
+            font-size: 0.55rem;
+            font-weight: 700;
+            padding: 2px 5px;
+            border-radius: 5px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+            z-index: 2;
+        }
+
+        .result-rank.rank-1-badge {
+            background-color: #FF3366;
+            color: white;
+        }
+
+        .result-name {
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: #1d1d1f;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            width: 100%;
+            padding: 0 2px;
+        }
+
+        .result-btn-group {
+            width: 100%;
+            max-width: 400px;
+            display: flex;
+            justify-content: center;
+            padding-bottom: 4px;
+        }
+
+        .static-gradient-btn {
+            background: linear-gradient(135deg, #8a65e8, #b185f5);
+            color: #ffffff;
+            border: none;
+            font-weight: 700;
+            cursor: pointer;
+            border-radius: 9999px;
+            box-shadow: 0 4px 16px rgba(138, 101, 232, 0.35);
+            transition: transform 0.1s ease, box-shadow 0.2s ease, background 0.2s ease;
+        }
+
+        .static-gradient-btn:active {
+            transform: scale(0.97);
+            box-shadow: 0 2px 8px rgba(138, 101, 232, 0.2);
+            background: linear-gradient(135deg, #7852d4, #9d6ceb);
+        }
+
+        .sub-action-btn {
+            width: 60%;
+            padding: 12px 0;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 게임 화면 (시작하자마자 바로 노출) -->
+    <div id="game-screen" class="screen game-container">
+        <div class="progress-section">
+            <div class="progress-text" id="progress-text">0%</div>
+            <div class="progress-bar-bg">
+                <div class="progress-bar-fill" id="progress-fill"></div>
+            </div>
+        </div>
+
+        <div class="question-box">
+            이 중에서 가장 마음에 드는 떡밥은 무엇인가요?
+        </div>
+
+        <div class="choice-grid" id="choices-box"></div>
+        
+        <div class="game-footer">
+            <button id="back-btn" class="back-btn hidden" onclick="goBack()">← 이전으로</button>
+        </div>
+    </div>
+
+    <!-- 결과 화면 -->
+    <div id="result-screen" class="screen result-container hidden">
+        <div></div>
+        
+        <div class="result-content-wrapper">
+            <div class="result-title-main">좋아하는 댠닺 떡밥 <span class="highlight">9선</span></div>
+            <div class="result-grid" id="result-box"></div>
+        </div>
+        
+        <div class="result-btn-group">
+            <button class="static-gradient-btn sub-action-btn" onclick="startGame()">다시 하기</button>
+        </div>
+    </div>
+
+    <script>
+        const rawItems = [
+            { id: 1, name: "연습실 하트", image: "1.jpg" },
+            { id: 2, name: "만두", image: "2.jpg" },
+            { id: 3, name: "스타즈 베이커리", image: "3.jpg" },
+            { id: 4, name: "댜니 생일", image: "4.jpg" },
+            { id: 5, name: "영화관 데이트", image: "5.jpg" },
+            { id: 6, name: "나 지우 옆에 갈래", image: "6.jpg" },
+            { id: 7, name: "에버랜드", image: "7.jpg" },
+            { id: 8, name: "스텔라는 저 좋아해요", image: "8.jpg" },
+            { id: 9, name: "커플 목걸이", image: "9.jpg" },
+            { id: 10, name: "어메이징 플러팅 실력", image: "10.jpg" },
+            { id: 11, name: "러브버그", image: "11.jpg" },
+            { id: 12, name: "더 자주 붙어 있도록 하세요", image: "12.jpg" },
+            { id: 13, name: "집착을 너무 심하게 하거든요", image: "13.jpg" },
+            { id: 14, name: "다현이 사랑해라고 해봐", image: "14.jpg" },
+            { id: 15, name: "뒷댠닺", image: "15.jpg" },
+            { id: 16, name: "귀여워", image: "16.jpg" },
+            { id: 17, name: "무릎", image: "17.jpg" },
+            { id: 18, name: "자기야", image: "18.jpg" },
+            { id: 19, name: "골져스 새침데기 플러팅", image: "19.jpg" },
+            { id: 20, name: "아웅다웅", image: "20.jpg" },
+            { id: 21, name: "손 만지작", image: "21.jpg" },
+            { id: 22, name: "갸루", image: "22.jpg" },
+            { id: 23, name: "애기", image: "23.jpg" },
+            { id: 24, name: "런닝맨 댠닺", image: "24.jpg" },
+            { id: 25, name: "루드 뽀뽀", image: "25.jpg" },
+            { id: 26, name: "하뀨하 뽀뽀", image: "26.jpg" },
+            { id: 27, name: "지우야 사랑해", image: "27.jpg" },
+            { id: 28, name: "은근슬쩍 최지우", image: "28.jpg" },
+            { id: 29, name: "꼰듀 귀요미", image: "29.jpg" },
+            { id: 30, name: "지우 하고싶어요?", image: "30.jpg" },
+            { id: 31, name: "애기 조용", image: "31.jpg" },
+            { id: 32, name: "뽀뽀해", image: "32.jpg" }
+        ];
+
+        const K_FACTOR = 32;        // ELO 변동 계수
+        const START_RATING = 1000;
+        const GROUP_SIZE = 4;        // 한 라운드당 보여주는 선택지 수
+        const QUALIFIER_CYCLES = 3;  // 예선 사이클 수 (32/4=8그룹 × 3 = 24라운드, 아이템당 3회)
+        const FINALIST_COUNT = 16;   // 결선 진출 인원
+        const TOTAL_ROUNDS = 50;     // 전체 목표 라운드 수
+
+        let items = [];
+        let currentRound = 1;
+        let maxRounds = 0;
+        let historyStack = [];
+        let currentChoices = [];
+        let lastSelectedId = null;
+        let matchQueue = [];         // { phase: 'qualifier'|'final', ids: [...] } 배열
+        let lastChoiceIds = null;
+        let qualifierRoundCount = 0; // 예선 라운드 수(전환 시점 판단용)
+        let finalStarted = false;
+
+        /* ---------- 균등 노출 대진표 생성 ----------
+           n명을 GROUP_SIZE명씩 그룹으로 나누는 라운드로빈을 cycles번 반복해
+           전원이 "정확히 같은 횟수"만큼 그룹에 포함되도록 한다.
+           n이 GROUP_SIZE의 배수가 아니면 남는 인원은 그대로 마지막 그룹에 합친다. */
+        function buildMatchQueue(ids, cycles) {
+            const n = ids.length;
+            const groupCount = Math.floor(n / GROUP_SIZE);
+            let queue = [];
+
+            for (let c = 0; c < cycles; c++) {
+                let pool = [...ids].sort(() => 0.5 - Math.random());
+
+                if (queue.length > 0) {
+                    const prevLastGroup = queue[queue.length - 1];
+                    let attempts = 0;
+                    while (attempts < 20) {
+                        const firstGroup = pool.slice(0, GROUP_SIZE);
+                        const overlap = firstGroup.filter(id => prevLastGroup.includes(id)).length;
+                        if (overlap <= 1) break;
+                        pool = [...ids].sort(() => 0.5 - Math.random());
+                        attempts++;
+                    }
+                }
+
+                for (let g = 0; g < groupCount; g++) {
+                    queue.push(pool.slice(g * GROUP_SIZE, (g + 1) * GROUP_SIZE));
+                }
+                // 나머지(그룹으로 나눠떨어지지 않는 인원)는 마지막 그룹에 합쳐 버림
+                const remainder = pool.slice(groupCount * GROUP_SIZE);
+                if (remainder.length > 0 && queue.length > 0) {
+                    queue[queue.length - 1] = queue[queue.length - 1].concat(remainder);
+                }
+            }
+            return queue;
+        }
+
+        function eloExpected(ra, rb) {
+            return 1 / (1 + Math.pow(10, (rb - ra) / 400));
+        }
+
+        // 그룹(2명 이상) 중 1명이 선택된 라운드를 승자 vs 나머지 각각의
+        // 개별 1:1 ELO 매치로 처리한다.
+        function applyEloForRound(group, winnerId) {
+            const winner = group.find(i => i.id === winnerId);
+            group.forEach(item => {
+                if (item.id === winnerId) return;
+                const loser = item;
+
+                const expectedWinner = eloExpected(winner.rating, loser.rating);
+                const expectedLoser = 1 - expectedWinner;
+
+                winner.rating = winner.rating + K_FACTOR * (1 - expectedWinner);
+                loser.rating = loser.rating + K_FACTOR * (0 - expectedLoser);
+            });
+        }
+
+        function startGame() {
+            items = rawItems.map(item => ({ ...item, rating: START_RATING }));
+            currentRound = 1;
+            historyStack = [];
+            currentChoices = [];
+            lastSelectedId = null;
+            lastChoiceIds = null;
+            finalStarted = false;
+
+            // 예선: 32명 전원, 균등 노출 (8그룹 × QUALIFIER_CYCLES 사이클)
+            const allIds = items.map(i => i.id);
+            const qualifierGroups = buildMatchQueue(allIds, QUALIFIER_CYCLES);
+            qualifierRoundCount = qualifierGroups.length;
+
+            matchQueue = qualifierGroups.map(g => ({ phase: 'qualifier', ids: g }));
+            // 결선 라운드는 예선 결과가 나온 뒤 동적으로 채워 넣는다 (buildFinalQueue 참고)
+            maxRounds = TOTAL_ROUNDS;
+
+            document.getElementById('result-screen').classList.add('hidden');
+            document.getElementById('game-screen').classList.remove('hidden');
+            nextRound();
+        }
+
+        // 예선이 끝난 시점의 레이팅으로 상위 FINALIST_COUNT명을 추려
+        // 남은 라운드(TOTAL_ROUNDS - qualifierRoundCount) 동안 균등 노출로 재검증한다.
+        function buildFinalQueue() {
+            const sorted = [...items].sort((a, b) => b.rating - a.rating);
+            const finalists = sorted.slice(0, FINALIST_COUNT).map(i => i.id);
+
+            // 결선 진입 시 레이팅을 리셋하지 않고 그대로 이어간다.
+            // (예선 성적도 유의미한 정보이므로 유지, 다만 이후 매치가 훨씬 많으므로
+            //  최종 순위는 결선 성적이 지배적으로 반영된다)
+            const remainingRounds = TOTAL_ROUNDS - qualifierRoundCount;
+            const finalGroupCount = Math.floor(FINALIST_COUNT / GROUP_SIZE); // 16/4=4
+            const cycles = Math.max(1, Math.round(remainingRounds / finalGroupCount));
+
+            let finalGroups = buildMatchQueue(finalists, cycles);
+            // 목표 라운드 수에 정확히 맞춤 (부족하면 사이클 추가, 넘치면 자르기)
+            while (finalGroups.length < remainingRounds) {
+                finalGroups = finalGroups.concat(buildMatchQueue(finalists, 1));
+            }
+            finalGroups = finalGroups.slice(0, remainingRounds);
+
+            matchQueue = matchQueue
+                .slice(0, qualifierRoundCount)
+                .concat(finalGroups.map(g => ({ phase: 'final', ids: g })));
+            maxRounds = matchQueue.length;
+        }
+
+        function nextRound(restoredChoiceIds = null, restoredSelectedId = null, restoredLastChoiceIds = null) {
+            // 예선 종료 시점: 결선 대진표를 동적으로 생성
+            if (!finalStarted && currentRound > qualifierRoundCount) {
+                buildFinalQueue();
+                finalStarted = true;
+            }
+
+            if (currentRound > maxRounds) {
+                endGame();
+                return;
+            }
+
+            let percent = Math.round(((currentRound - 1) / maxRounds) * 100);
+            document.getElementById('progress-text').innerText = `${percent}%`;
+            document.getElementById('progress-fill').style.width = `${percent}%`;
+
+            const backBtn = document.getElementById('back-btn');
+            if (currentRound > 1) {
+                backBtn.classList.remove('hidden');
+            } else {
+                backBtn.classList.add('hidden');
+            }
+
+            let groupIds;
+            if (restoredChoiceIds) {
+                groupIds = restoredChoiceIds;
+                lastSelectedId = restoredSelectedId;
+                lastChoiceIds = restoredLastChoiceIds;
+            } else {
+                groupIds = matchQueue[currentRound - 1].ids;
+                lastSelectedId = null;
+            }
+
+            currentChoices = groupIds.map(id => items.find(i => i.id === id));
+
+            let box = document.getElementById('choices-box');
+            box.innerHTML = '';
+
+            currentChoices.forEach(item => {
+                let card = document.createElement('div');
+                card.className = 'choice-card';
+
+                if (lastSelectedId === item.id) {
+                    card.classList.add('selected');
+                }
+
+                card.onclick = () => selectChoice(item, currentChoices, card);
+
+                let imgStyle = item.id === 9 ? 'object-position: 80% center;' : '';
+
+                card.innerHTML = `
+                    <div class="card-img-wrap">
+                        <img src="${item.image}" alt="${item.name}" style="${imgStyle}">
+                    </div>
+                    <div class="card-info">
+                        <div class="card-name">${item.name}</div>
+                    </div>
+                `;
+                box.appendChild(card);
+            });
+        }
+
+        function selectChoice(selected, group, cardElement) {
+            document.querySelectorAll('.choice-card').forEach(c => c.classList.remove('selected'));
+            cardElement.classList.add('selected');
+
+            historyStack.push({
+                itemsState: items.map(i => ({ ...i })),
+                round: currentRound,
+                choiceIds: group.map(i => i.id),
+                selectedId: selected.id,
+                savedLastChoiceIds: lastChoiceIds ? [...lastChoiceIds] : null,
+                matchQueueSnapshot: matchQueue.slice(),
+                maxRoundsSnapshot: maxRounds,
+                finalStartedSnapshot: finalStarted
+            });
+
+            lastChoiceIds = group.map(i => i.id);
+
+            applyEloForRound(group, selected.id);
+
+            currentRound++;
+
+            setTimeout(() => {
+                nextRound();
+            }, 250);
+        }
+
+        function goBack() {
+            if (historyStack.length === 0) return;
+
+            const lastState = historyStack.pop();
+            items = lastState.itemsState;
+            currentRound = lastState.round;
+            matchQueue = lastState.matchQueueSnapshot;
+            maxRounds = lastState.maxRoundsSnapshot;
+            finalStarted = lastState.finalStartedSnapshot;
+
+            nextRound(lastState.choiceIds, lastState.selectedId, lastState.savedLastChoiceIds);
+        }
+
+        function endGame() {
+            document.getElementById('game-screen').classList.add('hidden');
+            document.getElementById('result-screen').classList.remove('hidden');
+
+            let sorted = [...items].sort((a, b) => b.rating - a.rating);
+            let top9 = sorted.slice(0, 9);
+
+            const customOrderIndices = [3, 4, 5, 1, 0, 2, 6, 7, 8];
+            let orderedTop9 = customOrderIndices.map(index => top9[index]);
+
+            let resultBox = document.getElementById('result-box');
+            resultBox.innerHTML = '';
+
+            orderedTop9.forEach((item) => {
+                let actualRank = sorted.findIndex(i => i.id === item.id) + 1;
+
+                let card = document.createElement('div');
+                card.className = 'result-card';
+
+                let resultImgStyle = item.id === 9 ? 'object-position: 80% center;' : '';
+
+                card.innerHTML = `
+                    <div class="result-img-wrap">
+                        <div class="result-rank ${actualRank === 1 ? 'rank-1-badge' : ''}">${actualRank}위</div>
+                        <img src="${item.image}" alt="${item.name}" style="${resultImgStyle}">
+                    </div>
+                    <div class="result-name">${item.name}</div>
+                `;
+                resultBox.appendChild(card);
+            });
+        }
+
+        // 페이지가 열리자마자 바로 게임이 시작되도록 자동 실행
+        window.onload = function() {
+            startGame();
+        };
+    </script>
+</body>
+</html>
