@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>모바일 풀스크린 시뮬레이터</title>
+    <style>
+        /* 전체 PC/모바일 공통 초기화 */
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #1a1a1a;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            overflow: hidden;
+        }
+
+        /* PC 화면일 때의 아이폰 프레임 디자인 */
+        .iphone-frame {
+            width: 380px;
+            height: 780px;
+            background-color: #000;
+            border-radius: 50px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), inset 0 0 0 10px #333;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* 내부 스크린 화면 (사진 배경) */
+        .iphone-screen {
+            flex: 1;
+            background: url('IMG_0191.jpg') no-repeat center center;
+            background-size: cover;
+            margin: 12px;
+            border-radius: 40px;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* 홈 화면 */
+        #home-page {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: transparent;
+        }
+
+        /* 하단 홈 인디케이터 (흰색 바) */
+        .home-indicator {
+            width: 130px;
+            height: 5px;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 3px;
+            position: absolute;
+            bottom: 8px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            pointer-events: none; /* 클릭 방해 안 받게 설정 */
+        }
+
+        /* 📱 스마트폰(모바일 기기)에서 접속했을 때 꽉 차게 조절 */
+        @media screen and (max-width: 480px) {
+            body {
+                background-color: #000;
+            }
+
+            .iphone-frame {
+                width: 100vw;
+                height: 100vh;
+                border-radius: 0;
+                box-shadow: none;
+                background-color: transparent;
+            }
+
+            .iphone-screen {
+                margin: 0;
+                border-radius: 0;
+                width: 100%;
+                height: 100%;
+            }
+
+            /* 모바일에서는 하단 바를 조금 더 아래나 안전 영역에 맞게 조정 가능 */
+            .home-indicator {
+                bottom: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="iphone-frame">
+        <!-- 내부 화면 -->
+        <div class="iphone-screen">
+            <!-- 홈 화면 (배경사진만 표시) -->
+            <div id="home-page"></div>
+
+            <!-- 하단 흰색 홈 바 -->
+            <div class="home-indicator"></div>
+        </div>
+    </div>
+
+</body>
+</html>
