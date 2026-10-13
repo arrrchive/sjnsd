@@ -9,11 +9,13 @@
         body {
             margin: 0;
             padding: 0;
-            background-color: #1a1a1a;
+            background-color: #000;
             display: flex;
             justify-content: center;
             align-items: center;
+            /* 모바일 브라우저 주소창 고려하여 svh 단위 사용 */
             height: 100vh;
+            height: 100svh;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
             overflow: hidden;
         }
@@ -31,11 +33,11 @@
             flex-direction: column;
         }
 
-        /* 내부 스크린 화면 (사진 배경) */
+        /* 내부 스크린 화면 (사진이 잘리지 않게 contain 및 중앙 정렬) */
         .iphone-screen {
             flex: 1;
-            background: url('IMG_0191.jpg') no-repeat center center;
-            background-size: cover;
+            background: #000 url('IMG_0191.jpg') no-repeat center center;
+            background-size: contain; /* 사진 비율을 유지하면서 잘리지 않도록 전체 표시 */
             margin: 12px;
             border-radius: 40px;
             position: relative;
@@ -65,7 +67,7 @@
             left: 50%;
             transform: translateX(-50%);
             z-index: 1000;
-            pointer-events: none; /* 클릭 방해 안 받게 설정 */
+            pointer-events: none;
         }
 
         /* 📱 스마트폰(모바일 기기)에서 접속했을 때 꽉 차게 조절 */
@@ -77,9 +79,10 @@
             .iphone-frame {
                 width: 100vw;
                 height: 100vh;
+                height: 100svh; /* 모바일 브라우저 주소창 높이 오차 보정 */
                 border-radius: 0;
                 box-shadow: none;
-                background-color: transparent;
+                background-color: #000;
             }
 
             .iphone-screen {
@@ -87,9 +90,10 @@
                 border-radius: 0;
                 width: 100%;
                 height: 100%;
+                background-size: contain; /* 모바일에서도 사진이 짤리지 않게 비율 유지 */
+                background-color: #000;
             }
 
-            /* 모바일에서는 하단 바를 조금 더 아래나 안전 영역에 맞게 조정 가능 */
             .home-indicator {
                 bottom: 12px;
             }
