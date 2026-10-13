@@ -15,7 +15,6 @@
             align-items: center;
             height: 100vh;
             height: 100svh;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
             overflow: hidden;
         }
 
@@ -32,7 +31,7 @@
             flex-direction: column;
         }
 
-        /* 내부 스크린 화면 (사진 배경) */
+        /* 내부 스크린 화면 (시간과 날짜가 포함된 원본 사진 그대로 출력) */
         .iphone-screen {
             flex: 1;
             background: url('IMG_0191.jpg') no-repeat center center;
@@ -41,44 +40,6 @@
             border-radius: 40px;
             position: relative;
             overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        /* 홈 화면 / 잠금화면 스타일 (시간 위젯 배치) */
-        #home-page {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: transparent;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding-top: 60px; /* 상단에서 약간 내려오도록 설정 */
-            box-sizing: border-box;
-        }
-
-        /* 아이폰 잠금화면 시간/날짜 위젯 */
-        .home-time-widget {
-            text-align: center;
-            color: #fff;
-            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6); /* 배경 사진 위에서도 글자가 잘 보이게 그림자 추가 */
-        }
-
-        .home-time-widget h1 {
-            font-size: 56px;
-            margin: 0;
-            font-weight: 300;
-            letter-spacing: -1px;
-        }
-
-        .home-time-widget p {
-            font-size: 16px;
-            margin: 6px 0 0 0;
-            font-weight: 500;
         }
 
         /* 📱 스마트폰(모바일 기기)에서 접속했을 때 꽉 차게 조절 */
@@ -109,16 +70,8 @@
 <body>
 
     <div class="iphone-frame">
-        <!-- 내부 화면 -->
-        <div class="iphone-screen">
-            <!-- 홈 화면 (시간 위젯 및 배경사진) -->
-            <div id="home-page">
-                <div class="home-time-widget">
-                    <h1>14:19</h1>
-                    <p>10월 13일 (화)</p>
-                </div>
-            </div>
-        </div>
+        <!-- 내부 화면 (사진 원본 그대로 배경 적용) -->
+        <div class="iphone-screen"></div>
     </div>
 
 </body>
